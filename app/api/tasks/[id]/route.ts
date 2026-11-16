@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isDueDate, isPriority, type Priority } from '@/lib/task-validation';
 
 export type Context = {
   params: Promise<{ id: string }>;
@@ -10,6 +11,8 @@ type TaskRow = {
   title: string;
   completed: number;
   created_at: string;
+  due_date: string | null;
+  priority: Priority;
 };
 
 export function getId(value: string): number | null {
@@ -71,6 +74,8 @@ export async function PATCH(request: Request, context: Context) {
   const input = body as Record<string, unknown>;
   const title = typeof input.title === 'string' ? input.title : undefined;
   const completed = typeof input.completed === 'boolean' ? input.completed : undefined;
+  const dueDate = input.due_date;
+  const priority = input.priority;
 
   const nextTitle = title === undefined ? current.title : title.trim();
   const nextCompleted = completed === undefined ? Boolean(current.completed) : completed;
@@ -79,10 +84,31 @@ export async function PATCH(request: Request, context: Context) {
     return NextResponse.json({ error: 'Title must be 1-120 characters.' }, { status: 400 });
   }
 
-  if (title !== undefined || completed !== undefined) {
+  if (dueDate !== undefined && !isDueDate(dueDate)) {
+    return NextResponse.json({ error: 'Due date must be a valid date or null.' }, { status: 400 });
+  }
+
+  if (priority !== undefined && !isPriority(priority)) {
+    return NextResponse.json({ error: 'Priority must be low, medium, or high.' }, { status: 400 });
+  }
+
+  if (
+    title !== undefined ||
+    completed !== undefined ||
+    dueDate !== undefined ||
+    priority !== undefined
+  ) {
     db.prepare(
-      'UPDATE tasks SET title = ?, completed = ? WHERE id = ?',
-    ).run(nextTitle, Number(nextCompleted), taskId);
+      `UPDATE tasks
+       SET title = ?, completed = ?, due_date = ?, priority = ?
+       WHERE id = ?`,
+    ).run(
+      nextTitle,
+      Number(nextCompleted),
+      dueDate === undefined ? current.due_date : dueDate,
+      priority === undefined ? current.priority : priority,
+      taskId,
+    );
   }
 
   const updated = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as TaskRow;

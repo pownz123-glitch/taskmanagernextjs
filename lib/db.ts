@@ -15,8 +15,20 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     completed INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    due_date TEXT,
+    priority TEXT NOT NULL DEFAULT 'medium'
   )
 `);
+
+const columns = db.pragma('table_info(tasks)') as Array<{ name: string }>;
+
+if (!columns.some((column) => column.name === 'due_date')) {
+  db.exec('ALTER TABLE tasks ADD COLUMN due_date TEXT');
+}
+
+if (!columns.some((column) => column.name === 'priority')) {
+  db.exec("ALTER TABLE tasks ADD COLUMN priority TEXT NOT NULL DEFAULT 'medium'");
+}
 
 export default db;

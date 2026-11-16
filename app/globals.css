@@ -40,7 +40,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -153,6 +154,16 @@ input {
   font-weight: 700;
 }
 
+.task-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(160px, 1fr) minmax(140px, 0.8fr);
+  gap: 14px;
+}
+
+.field-group {
+  min-width: 0;
+}
+
 .task-input {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.8);
@@ -173,6 +184,31 @@ input {
   display: flex;
   gap: 12px;
   margin-top: 18px;
+}
+
+.task-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.filter-btn {
+  border: 1px solid rgba(148, 163, 184, 0.65);
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  background: rgba(255, 255, 255, 0.7);
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.filter-btn.selected {
+  border-color: #145fba;
+  background: #145fba;
+  color: white;
 }
 
 .primary-btn,
@@ -267,6 +303,12 @@ input {
   color: #0f172a;
 }
 
+.task-description {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .task-text.done {
   color: #64748b;
   text-decoration: line-through;
@@ -274,7 +316,36 @@ input {
 
 .task-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.task-due-date {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.priority-badge {
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.priority-low {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.priority-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.priority-high {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .small-btn {
@@ -315,8 +386,13 @@ input {
     align-items: stretch;
   }
 
+  .task-form-grid {
+    grid-template-columns: 1fr;
+  }
+
   .task-actions {
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
 
   .form-actions {
